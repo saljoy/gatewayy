@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store Lab | Fluid Payment Gateway</title>
+    <!-- Tailwind for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- GSAP for Fluid Animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <style>
+        :root {
+            --shopify-green: #95BF47;
+            --shopify-dark: #5E8E3E;
+            --shopify-accent: #F8FAF4;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            background-color: #ffffff;
+        }
+
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(149, 191, 71, 0.1);
+        }
+
+        .text-shopify-green { color: var(--shopify-dark); }
+        .bg-shopify-green { background-color: var(--shopify-green); }
+        .border-shopify-green { border-color: var(--shopify-green); }
+        
+        .blob-bg {
+            position: absolute;
+            z-index: -1;
+            filter: blur(80px);
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .hero-gradient {
+            background: radial-gradient(circle at top right, #F8FAF4 0%, #ffffff 100%);
+        }
+
+        .card-reveal {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .fluid-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .fluid-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(94, 142, 62, 0.1);
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(2deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <!-- Background Elements -->
+    <div class="fixed inset-0 pointer-events-none overflow-hidden -z-10">
+        <div class="blob-bg bg-shopify-green w-[500px] h-[500px] -top-40 -right-40 rounded-full floating"></div>
+        <div class="blob-bg bg-[#C5E08E] w-[400px] h-[400px] top-1/2 -left-40 rounded-full floating" style="animation-delay: -2s;"></div>
+    </div>
+
+    <!-- HEADER / NAVIGATION -->
+    <nav class="glass-nav sticky top-0 z-50 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-2 group cursor-pointer">
+                <div class="p-2 bg-shopify-green rounded-lg group-hover:rotate-12 transition-transform duration-300">
+                    <i data-lucide="microscope" class="text-white w-6 h-6"></i>
+                </div>
+                <span class="text-2xl font-bold tracking-tight text-gray-900">Store<span class="text-shopify-green">Lab</span></span>
+            </div>
+            
+            <div class="hidden md:flex gap-10 font-medium text-gray-600">
+                <a href="#" class="hover:text-shopify-green transition-colors relative group">Home
+                    <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-shopify-green transition-all group-hover:w-full"></span>
+                </a>
+                <a href="#about" class="hover:text-shopify-green transition-colors relative group">About
+                    <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-shopify-green transition-all group-hover:w-full"></span>
+                </a>
+                <a href="#services" class="hover:text-shopify-green transition-colors relative group">Services
+                    <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-shopify-green transition-all group-hover:w-full"></span>
+                </a>
+                <a href="#contact" class="hover:text-shopify-green transition-colors relative group">Contact
+                    <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-shopify-green transition-all group-hover:w-full"></span>
+                </a>
+            </div>
+
+            <button class="hidden md:block bg-shopify-green text-white px-7 py-2.5 rounded-full font-bold shadow-lg shadow-shopify-green/20 hover:bg-[#5E8E3E] hover:-translate-y-0.5 transition-all">
+                Get Started
+            </button>
+            
+            <button class="md:hidden text-gray-900"><i data-lucide="menu"></i></button>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <section class="hero-gradient relative pt-20 pb-32 px-6 overflow-hidden">
+        <div class="max-w-7xl mx-auto text-center relative z-10">
+            <div id="hero-badge" class="inline-flex items-center gap-2 bg-[#F0F7E6] text-[#5E8E3E] px-4 py-1.5 rounded-full text-sm font-bold mb-8 opacity-0">
+                <i data-lucide="award" class="w-4 h-4"></i>
+                Trusted by 10,000+ Freelancers Worldwide
+            </div>
+            <h1 id="hero-title" class="text-5xl md:text-7xl font-extrabold text-gray-900 leading-tight mb-8 opacity-0">
+                Store Lab <br class="hidden md:block">
+                <span class="text-shopify-green">Payment Gateway</span>
+            </h1>
+            <p id="hero-text" class="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto mb-12 opacity-0">
+                Securely receive payments from clients worldwide using trusted platforms like PayPal, Wise, and Skrill. Streamline your freelance transactions today.
+            </p>
+            
+            <div id="hero-btns" class="flex flex-col sm:flex-row justify-center gap-5 mb-20 opacity-0">
+                <button class="bg-shopify-green text-white px-10 py-4 rounded-full font-bold shadow-xl shadow-shopify-green/30 hover:bg-[#5E8E3E] hover:scale-105 transition-all text-lg flex items-center justify-center gap-2">
+                    View Payment Options <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                </button>
+                <button class="bg-white border-2 border-shopify-green text-shopify-green px-10 py-4 rounded-full font-bold hover:bg-shopify-green hover:text-white transition-all text-lg">
+                    Learn More
+                </button>
+            </div>
+
+            <div id="hero-stats" class="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-4xl mx-auto border-t border-gray-100 pt-12 opacity-0">
+                <div class="flex flex-col items-center">
+                    <span class="text-3xl font-black text-gray-900 mb-1">190+</span>
+                    <span class="text-gray-500 uppercase tracking-widest text-xs font-bold">Countries Supported</span>
+                </div>
+                <div class="flex flex-col items-center">
+                    <span class="text-3xl font-black text-gray-900 mb-1">Instant</span>
+                    <span class="text-gray-500 uppercase tracking-widest text-xs font-bold">Processing Power</span>
+                </div>
+                <div class="flex flex-col items-center">
+                    <span class="text-3xl font-black text-gray-900 mb-1">Bank-Level</span>
+                    <span class="text-gray-500 uppercase tracking-widest text-xs font-bold">Security Protocols</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- EMAIL CAPTURE -->
+    <section class="py-24 relative">
+        <div class="max-w-4xl mx-auto px-6">
+            <div class="bg-white rounded-3xl p-8 md:p-16 shadow-2xl shadow-gray-200/50 border border-gray-100 text-center card-reveal">
+                <div class="w-16 h-16 bg-shopify-green/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                    <i data-lucide="mail" class="text-shopify-green w-8 h-8"></i>
+                </div>
+                <span class="text-shopify-green font-black uppercase tracking-widest text-xs mb-2 block">Step 1</span>
+                <h2 class="text-3xl md:text-4xl font-bold mb-4 text-gray-900">Enter Your Email</h2>
+                <p class="text-gray-600 mb-10 max-w-md mx-auto">We'll use your email for payment verification and to send you instructions instantly.</p>
+                
+                <form class="flex flex-col md:flex-row gap-4 max-w-xl mx-auto mb-6">
+                    <input type="email" placeholder="your@email.com" class="flex-1 px-6 py-4 rounded-full border-2 border-gray-100 focus:border-shopify-green outline-none transition-all text-lg">
+                    <button class="bg-shopify-green text-white px-10 py-4 rounded-full font-bold hover:bg-[#5E8E3E] transition-all text-lg shadow-lg shadow-shopify-green/20">
+                        Continue
+                    </button>
+                </form>
+                
+                <div class="flex items-center justify-center gap-6 text-sm text-gray-400">
+                    <span class="flex items-center gap-1.5"><i data-lucide="shield-check" class="w-4 h-4 text-shopify-green"></i> 256-bit SSL</span>
+                    <span class="flex items-center gap-1.5"><i data-lucide="lock" class="w-4 h-4 text-shopify-green"></i> Privacy First</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- WHY WE EXIST -->
+    <section id="about" class="py-32 px-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid lg:grid-cols-2 gap-20 items-center mb-24">
+                <div class="card-reveal">
+                    <h2 class="text-4xl md:text-5xl font-bold mb-6">Empowering the <br><span class="text-shopify-green italic">Global Freelancer</span></h2>
+                    <p class="text-xl text-gray-600 leading-relaxed">Store Lab exists to bridge the gap between talented freelancers and their international clients. We provide the infrastructure to navigate complex cross-border payments without the headache, ensuring you get paid for your hard work, securely and swiftly.</p>
+                </div>
+                <div class="grid grid-cols-2 gap-6 card-reveal">
+                    <div class="bg-shopify-green p-8 rounded-3xl text-white floating">
+                        <i data-lucide="globe" class="w-10 h-10 mb-4 opacity-50"></i>
+                        <h4 class="text-3xl font-bold">100%</h4>
+                        <p class="text-sm opacity-80">Global Coverage</p>
+                    </div>
+                    <div class="bg-gray-900 p-8 rounded-3xl text-white mt-8 floating" style="animation-delay: -1.5s;">
+                        <i data-lucide="zap" class="w-10 h-10 mb-4 text-shopify-green"></i>
+                        <h4 class="text-3xl font-bold">Instant</h4>
+                        <p class="text-sm opacity-80">Payment Logs</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Cards -->
+                <div class="bg-white p-8 rounded-3xl border border-gray-100 fluid-card card-reveal">
+                    <div class="w-12 h-12 bg-shopify-green/10 rounded-xl flex items-center justify-center mb-6">
+                        <i data-lucide="shield" class="text-shopify-green"></i>
+                    </div>
+                    <h3 class="font-bold text-xl mb-3 text-gray-900">Secure Platform</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed">Bank-level encryption through trusted services like PayPal, Wise, and Skrill.</p>
+                </div>
+                <div class="bg-white p-8 rounded-3xl border border-gray-100 fluid-card card-reveal">
+                    <div class="w-12 h-12 bg-shopify-green/10 rounded-xl flex items-center justify-center mb-6">
+                        <i data-lucide="eye-off" class="text-shopify-green"></i>
+                    </div>
+                    <h3 class="font-bold text-xl mb-3 text-gray-900">Data Privacy</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed">We never store your financial data. Only verification references are used.</p>
+                </div>
+                <div class="bg-white p-8 rounded-3xl border border-gray-100 fluid-card card-reveal">
+                    <div class="w-12 h-12 bg-shopify-green/10 rounded-xl flex items-center justify-center mb-6">
+                        <i data-lucide="check-circle-2" class="text-shopify-green"></i>
+                    </div>
+                    <h3 class="font-bold text-xl mb-3 text-gray-900">Transparent Fees</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed">No hidden surprises. All service fees are shown upfront before any transfer.</p>
+                </div>
+                <div class="bg-white p-8 rounded-3xl border border-gray-100 fluid-card card-reveal">
+                    <div class="w-12 h-12 bg-shopify-green/10 rounded-xl flex items-center justify-center mb-6">
+                        <i data-lucide="briefcase" class="text-shopify-green"></i>
+                    </div>
+                    <h3 class="font-bold text-xl mb-3 text-gray-900">Professional Only</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed">Optimized specifically for legitimate freelance and business transactions.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- COMMITMENT -->
+    <section class="bg-gray-900 py-24 px-6 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10">
+            <svg class="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <path d="M0,0 L100,100 M100,0 L0,100" stroke="white" stroke-width="0.1" fill="none" />
+            </svg>
+        </div>
+        <div class="max-w-7xl mx-auto relative z-10 text-center mb-20 card-reveal">
+            <h2 class="text-4xl font-bold text-white mb-4">Our Commitment</h2>
+            <div class="h-1 w-20 bg-shopify-green mx-auto rounded-full"></div>
+        </div>
+        <div class="max-w-7xl mx-auto grid md:grid-cols-3 gap-12">
+            <div class="text-center card-reveal">
+                <div class="text-shopify-green mb-6 flex justify-center"><i data-lucide="user-x" class="w-10 h-10"></i></div>
+                <h4 class="text-white text-xl font-bold mb-3">No Fraud Tolerated</h4>
+                <p class="text-gray-400">We maintain a zero-tolerance policy for fraudulent activities.</p>
+            </div>
+            <div class="text-center card-reveal">
+                <div class="text-shopify-green mb-6 flex justify-center"><i data-lucide="cpu" class="w-10 h-10"></i></div>
+                <h4 class="text-white text-xl font-bold mb-3">Top-Tier Tech</h4>
+                <p class="text-gray-400">Running on the world's most secure payment infrastructures.</p>
+            </div>
+            <div class="text-center card-reveal">
+                <div class="text-shopify-green mb-6 flex justify-center"><i data-lucide="eye" class="w-10 h-10"></i></div>
+                <h4 class="text-white text-xl font-bold mb-3">Pure Transparency</h4>
+                <p class="text-gray-400">Verifiable tracking for every single cent that passes through.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- WHY CHOOSE US -->
+    <section id="services" class="py-32 px-6 bg-white">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-20 card-reveal">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6 text-gray-900">Why Choose Store Lab?</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">Experience the next generation of global financial workflows with speed and security at the core.</p>
+            </div>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Feature Card 1 -->
+                <div class="group p-10 bg-gray-50 rounded-[40px] hover:bg-shopify-green hover:text-white transition-all duration-500 card-reveal">
+                    <span class="text-xs font-black uppercase tracking-tighter opacity-50">Encryption</span>
+                    <div class="text-5xl font-black my-4 group-hover:scale-110 origin-left transition-transform">256-bit</div>
+                    <h4 class="text-xl font-bold mb-2">Secure Transactions</h4>
+                    <p class="text-sm opacity-70 leading-relaxed">Industry-standard SSL encryption safeguarding your every click.</p>
+                </div>
+                <!-- ... others ... -->
+                <div class="group p-10 bg-gray-50 rounded-[40px] hover:bg-shopify-green hover:text-white transition-all duration-500 card-reveal">
+                    <span class="text-xs font-black uppercase tracking-tighter opacity-50">Global Reach</span>
+                    <div class="text-5xl font-black my-4 group-hover:scale-110 origin-left transition-transform">190+</div>
+                    <h4 class="text-xl font-bold mb-2">Countries</h4>
+                    <p class="text-sm opacity-70 leading-relaxed">Connect with clients from Tokyo to New York without limits.</p>
+                </div>
+                <div class="group p-10 bg-gray-50 rounded-[40px] hover:bg-shopify-green hover:text-white transition-all duration-500 card-reveal">
+                    <span class="text-xs font-black uppercase tracking-tighter opacity-50">Speed</span>
+                    <div class="text-5xl font-black my-4 group-hover:scale-110 origin-left transition-transform">&lt;1h</div>
+                    <h4 class="text-xl font-bold mb-2">Support Time</h4>
+                    <p class="text-sm opacity-70 leading-relaxed">Real human support in under 60 minutes, guaranteed.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- VERIFICATION FORM -->
+    <section id="contact" class="py-32 bg-shopify-accent px-6">
+        <div class="max-w-3xl mx-auto">
+            <div class="bg-white rounded-[40px] p-10 md:p-16 shadow-2xl shadow-shopify-green/5 card-reveal">
+                <div class="text-center mb-12">
+                    <div class="inline-block p-4 bg-shopify-green/10 rounded-2xl mb-6">
+                        <i data-lucide="clipboard-check" class="text-shopify-green w-10 h-10"></i>
+                    </div>
+                    <h2 class="text-4xl font-black text-gray-900 mb-2">Payment Verification</h2>
+                    <p class="text-gray-500 italic">Submit Proof of Transaction</p>
+                </div>
+
+                <form class="space-y-8">
+                    <div class="space-y-2">
+                        <label class="font-bold text-sm tracking-wide text-gray-700">Email Address *</label>
+                        <input type="email" placeholder="your@email.com" class="w-full bg-gray-50 border-2 border-transparent focus:border-shopify-green p-5 rounded-2xl outline-none transition-all">
+                        <p class="text-xs text-gray-400">Used for transaction correspondence and tracking.</p>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="font-bold text-sm tracking-wide text-gray-700">Upload Screenshot</label>
+                        <label class="group cursor-pointer border-2 border-dashed border-gray-200 hover:border-shopify-green p-10 rounded-2xl flex flex-col items-center justify-center transition-all bg-gray-50 hover:bg-white">
+                            <i data-lucide="cloud-upload" class="text-gray-300 group-hover:text-shopify-green group-hover:-translate-y-2 transition-all mb-3 w-10 h-10"></i>
+                            <span class="text-gray-500 font-medium">Click or Drag Image Here</span>
+                            <span class="text-xs text-gray-400 mt-2">PNG, JPG (Max 5MB)</span>
+                            <input type="file" class="hidden">
+                        </label>
+                    </div>
+
+                    <div class="flex items-center gap-4 py-2">
+                        <div class="h-[1px] bg-gray-200 flex-1"></div>
+                        <span class="text-xs font-black text-gray-300 uppercase italic">Or use Link</span>
+                        <div class="h-[1px] bg-gray-200 flex-1"></div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="font-bold text-sm tracking-wide text-gray-700">Tracking Link</label>
+                        <input type="url" placeholder="https://wise.com/track/..." class="w-full bg-gray-50 border-2 border-transparent focus:border-shopify-green p-5 rounded-2xl outline-none transition-all">
+                    </div>
+
+                    <button class="w-full bg-shopify-green text-white py-6 rounded-2xl font-black text-xl hover:bg-[#5E8E3E] hover:-translate-y-1 hover:shadow-2xl shadow-shopify-green/40 transition-all flex items-center justify-center gap-3">
+                        Submit Payment Proof <i data-lucide="send" class="w-6 h-6"></i>
+                    </button>
+                    
+                    <p class="text-center text-[10px] text-gray-400 px-6 uppercase tracking-widest font-bold">
+                        Encrypted Processing • 24h Review Window • No Data Resale
+                    </p>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-gray-950 text-white pt-24 pb-12 overflow-hidden relative">
+        <div class="absolute bottom-0 right-0 p-40 bg-shopify-green/10 blur-[150px] rounded-full translate-x-1/2 translate-y-1/2"></div>
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 mb-24 relative z-10">
+            <div>
+                <div class="flex items-center gap-2 mb-8">
+                    <div class="p-2 bg-shopify-green rounded-lg"><i data-lucide="microscope" class="text-white w-6 h-6"></i></div>
+                    <span class="text-2xl font-bold">Store Lab</span>
+                </div>
+                <p class="text-gray-500 text-sm leading-relaxed mb-6">The Global Payment Gateway Guru. We empower the next generation of digital nomads and freelancers.</p>
+                <a href="mailto:support@storelab.com" class="text-shopify-green hover:underline font-bold text-lg">support@storelab.com</a>
+            </div>
+            
+            <div>
+                <h4 class="font-black text-xs uppercase tracking-widest mb-8 text-gray-400">Navigation</h4>
+                <ul class="space-y-4 text-gray-500 font-medium">
+                    <li><a href="#" class="hover:text-shopify-green transition-colors">Platform Home</a></li>
+                    <li><a href="#about" class="hover:text-shopify-green transition-colors">Our Mission</a></li>
+                    <li><a href="#services" class="hover:text-shopify-green transition-colors">Partner Ecosystem</a></li>
+                    <li><a href="#contact" class="hover:text-shopify-green transition-colors">Merchant Support</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="font-black text-xs uppercase tracking-widest mb-8 text-gray-400">Payment Partners</h4>
+                <ul class="space-y-4 text-gray-500 font-medium">
+                    <li><a href="#" class="hover:text-shopify-green transition-colors">Wise (TransferWise)</a></li>
+                    <li><a href="#" class="hover:text-shopify-green transition-colors">PayPal Global</a></li>
+                    <li><a href="#" class="hover:text-shopify-green transition-colors">Skrill Merchant</a></li>
+                    <li><a href="#" class="hover:text-shopify-green transition-colors">Xoom Business</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="font-black text-xs uppercase tracking-widest mb-8 text-gray-400">Legal</h4>
+                <ul class="space-y-4 text-gray-500 font-medium">
+                    <li><a href="#" class="hover:text-shopify-green transition-colors">Privacy Shield</a></li>
+                    <li><a href="#" class="hover:text-shopify-green transition-colors">Terms of Gateway</a></li>
+                    <li><a href="#" class="hover:text-shopify-green transition-colors">Cookie Policy</a></li>
+                    <li><a href="#" class="hover:text-shopify-green transition-colors">Legal Disclaimer</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-6 border-t border-gray-900 pt-12 relative z-10">
+            <div class="bg-gray-900/50 p-6 rounded-2xl mb-10">
+                <p class="text-[11px] text-gray-500 leading-relaxed italic">
+                    <strong>Disclaimer:</strong> Store Lab is an information display and verification platform. We do not process funds directly. All transactions are handled by licensed third-party processors. We are not responsible for bank delays, intermediary fees, or foreign exchange fluctuations controlled by partner platforms.
+                </p>
+            </div>
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                <p class="text-xs text-gray-600">© 2026 Store Lab. Engineered for Freelancers.</p>
+                <div class="flex gap-4">
+                    <div class="w-10 h-10 bg-gray-900 rounded-full flex items-center justify-center hover:bg-shopify-green transition-colors cursor-pointer"><i data-lucide="twitter" class="w-4 h-4"></i></div>
+                    <div class="w-10 h-10 bg-gray-900 rounded-full flex items-center justify-center hover:bg-shopify-green transition-colors cursor-pointer"><i data-lucide="linkedin" class="w-4 h-4"></i></div>
+                    <div class="w-10 h-10 bg-gray-900 rounded-full flex items-center justify-center hover:bg-shopify-green transition-colors cursor-pointer"><i data-lucide="github" class="w-4 h-4"></i></div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Init Lucide
+        lucide.createIcons();
+
+        // Register GSAP Plugins
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Hero Animations
+        window.addEventListener('load', () => {
+            const tl = gsap.timeline();
+            tl.to("#hero-badge", { opacity: 1, y: -10, duration: 0.8, ease: "power4.out" })
+              .to("#hero-title", { opacity: 1, y: -20, duration: 0.8, ease: "power4.out" }, "-=0.6")
+              .to("#hero-text", { opacity: 1, y: -20, duration: 0.8, ease: "power4.out" }, "-=0.6")
+              .to("#hero-btns", { opacity: 1, y: -20, duration: 0.8, ease: "power4.out" }, "-=0.6")
+              .to("#hero-stats", { opacity: 1, y: -20, duration: 0.8, ease: "power4.out" }, "-=0.6");
+        });
+
+        // Scroll Reveal for cards
+        gsap.utils.toArray('.card-reveal').forEach(card => {
+            gsap.to(card, {
+                opacity: 1,
+                y: 0,
+                duration: 1,
+                scrollTrigger: {
+                    trigger: card,
+                    start: "top 85%",
+                    toggleActions: "play none none none"
+                }
+            });
+        });
+
+        // Navigation effect on scroll
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 50) {
+                nav.classList.add('py-2', 'shadow-xl');
+                nav.classList.remove('py-4');
+            } else {
+                nav.classList.remove('py-2', 'shadow-xl');
+                nav.classList.add('py-4');
+            }
+        });
+    </script>
+</body>
+</html>
